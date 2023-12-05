@@ -10,16 +10,15 @@ def homepage():
     :return: 首页
     """
     if 'username' in session:
-        # 检查是不是房间使用者，是的话返回房间使用者首页，不是的话返回管理者或者前台首页
-        # if session['username' ]==?:
-        #     return render_template('')
-        # else:
-        #     url_for('customer.homepage')
+        if session['identification'] == '客户':
+            return 'hello'
+        else:
+            return redirect(url_for('hotel_receptionist.homepage'))
         pass
 
     else:
         # 连注册都没注册的话送到登录页面去
-        return url_for('log_and_submit.login')
+        return redirect(url_for('log_and_submit.login'))
 
 
 @customer.route('/open_condition')
@@ -38,7 +37,7 @@ def open_condition():
 
     else:
         # 连注册都没注册的话送到登录页面去
-        return url_for('log_and_submit.login')
+        return redirect(url_for('log_and_submit.login'))
 
 
 @customer.route('/check')
@@ -57,7 +56,7 @@ def check():
 
     else:
         # 连注册都没注册的话送到登录页面去
-        return url_for('log_and_submit.login')
+        return redirect(url_for('log_and_submit.login'))
 
 
 @customer.route('/change')
@@ -76,4 +75,4 @@ def change():
 
     else:
         # 连注册都没注册的话送到登录页面去
-        return url_for('log_and_submit.login')
+        return redirect(url_for('log_and_submit.login'))

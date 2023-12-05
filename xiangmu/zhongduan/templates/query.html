@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>动态按钮页面</title>
+    <script>
+        function confirmAndHandle(element, isInList2, targetUrl) {
+            // 显示确认弹窗
+            var confirmed = confirm("您确定么？");
+            if (confirmed) {
+                if (isInList2) {
+                    // 用户点击了确定，且元素在list2中，执行跳转
+                    window.location.href = targetUrl + '?element=' + encodeURIComponent(element);
+                } else {
+                    // 用户点击了确定，但元素不在list2中，显示消息
+                    alert('{{ message }}');
+                }
+            }
+            // 如果用户点击了取消，则不执行任何操作
+        }
+    </script>
+    <style>
+        .blue-button { background-color: blue; color: white; }
+        .gray-button { background-color: gray; color: white; }
+    </style>
+</head>
+<body>
+    {% for element in list1 %}
+        {% if element in list2 %}
+            <button class="blue-button" onclick="confirmAndHandle('{{ element }}', true, '{{ target_url }}')">
+                {{ element }}
+            </button>
+        {% else %}
+            <button class="gray-button" onclick="confirmAndHandle('{{ element }}', false)">
+                {{ element }}
+            </button>
+        {% endif %}
+    {% endfor %}
+</body>
+</html>

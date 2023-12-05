@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录验证</title>
+</head>
+<body>
+    <h1>用户登录</h1>
+    <form action="/submit" method="post">
+        <input type="text" name="username" placeholder="用户名">
+        <input type="password" name="password" placeholder="密码">
+        <input type="submit" value="提交">
+        <div style="color: red;">{{ 输错了 }}</div>
+    </form>
+    <form action="/login" method="post">
+        <button type="submit">尊贵的用户点击这里！</button>
+    </form>
+</body>
+</html>
