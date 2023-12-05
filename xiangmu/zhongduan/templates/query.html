@@ -6,7 +6,7 @@
     <script>
         function confirmAndHandle(element, isInList2, targetUrl) {
             // 显示确认弹窗
-            var confirmed = confirm("您确定么？");
+            var confirmed = confirm("您确定选择 " + element + " 吗？");
             if (confirmed) {
                 if (isInList2) {
                     // 用户点击了确定，且元素在list2中，执行跳转
