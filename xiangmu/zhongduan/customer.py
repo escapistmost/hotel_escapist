@@ -65,7 +65,7 @@ def update_ac():
         print(key,value)
         data[key] = value
     print(type(data))
-    response = requests.post('http://se.dahuangggg.me:8000/api/conditioners/update_ac_info/',data=data,params={'token':'abc'})
+    #response = requests.post('http://10.129.67.27:8000/api/conditioners/update_ac_info/',data=data,params={'token':'abc'})
     print(response.status_code)
     if(response.status_code == 200):
         print('更新成功')
