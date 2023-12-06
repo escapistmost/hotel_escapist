@@ -15,23 +15,49 @@ def setting_info():
         if setting:
             return jsonify({
                 'status': setting.status,
-                'mode': setting.mode
-                # 包含其他字段
+                'temperatureUpper': setting.temperature_upper,
+                'temperatureLower': setting.temperature_lower,
+                'mode': setting.mode,
+                'lowSpeedFee': setting.low_speed_fee,
+                'midSpeedFee': setting.mid_speed_fee,
+                'highSpeedFee': setting.high_speed_fee,
             }), 200
         else:
             return jsonify({'error': '设置信息不存在'}), 404
 
     elif request.method == 'POST':
-        setting_data = request.json
-        setting = Settings.query.first()  # 获取第一个设置记录
-        if setting:
-            setting.status = setting_data.get('status', setting.status)
-            setting.mode = setting_data.get('mode', setting.mode)
-            # 更新其他字段
-            db.session.commit()
-            return jsonify({'success': '设置更新成功'}), 200
-        else:
-            return jsonify({'error': '设置信息不存在'}), 404
+        try:
+            setting = Settings.query.get(1)  # 假设我们总是更新 id 为 1 的记录
+            if not setting:
+                return jsonify({'error': '设置信息不存在'}), 404
 
-    else:
-        return jsonify({'error': '不支持的请求方法'}), 405
+            request_data = request.get_json()
+
+            if 'status' in request_data:
+                setting.status = request_data['status']
+            if 'temperatureUpper' in request_data:
+                setting.temperature_upper = request_data['temperatureUpper']
+            if 'temperatureLower' in request_data:
+                setting.temperature_lower = request_data['temperatureLower']
+            if 'mode' in request_data:
+                setting.mode = request_data['mode']
+            if 'lowSpeedFee' in request_data:
+                setting.low_speed_fee = request_data['lowSpeedFee']
+            if 'midSpeedFee' in request_data:
+                setting.mid_speed_fee = request_data['midSpeedFee']
+            if 'highSpeedFee' in request_data:
+                setting.high_speed_fee = request_data['highSpeedFee']
+
+            db.session.commit()
+
+            return jsonify({
+                'status': setting.status,
+                'temperatureUpper': setting.temperature_upper,
+                'temperatureLower': setting.temperature_lower,
+                'mode': setting.mode,
+                'lowSpeedFee': setting.low_speed_fee,
+                'midSpeedFee': setting.mid_speed_fee,
+                'highSpeedFee': setting.high_speed_fee
+            }), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 404
