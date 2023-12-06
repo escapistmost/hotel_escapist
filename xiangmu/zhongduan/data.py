@@ -1,4 +1,8 @@
 # 这个文件是用来存储数据库中得到信息的中转用的
+from flask import Flask, render_template, request, redirect, url_for, session, Blueprint
+import requests
+import json
+
 
 class log_data():
     """
@@ -23,33 +27,85 @@ class hotel_data():
         self.used_id = None
         self.username = username
 
+    def __str__(self) -> str:
+        return self.username
+
     def room(self):
         """
         获取当前房屋的使用信息
         """
-        self.room_id = ['101', '102', '103', '104']  # 所有房间号
-        self.nused_id = ['101', '102']  # 没人用的
-        self.used_id = ['103', '104']  # 有人在用
+        response = requests.get('http://se.dahuangggg.me:8000/api/acounts/get_rooms_name/')
+        self.room_id = list(json.loads(response.content).values())[0] # 所有房间号
+        response = requests.get('http://se.dahuangggg.me:8000/api/conditioners/reception_get_room_number/')
+        self.nused_id = list(json.loads(response.content).values())[0] # 没人用的
+        self.nused_id = [key for key in self.nused_id.keys() if self.nused_id[key] == False]
+        self.used_id = [item for item in self.room_id if item not in self.nused_id]  # 有人在用
 
     def check_in(self, room_id, password):
         """
         入住
         """
-        return True
+        data = {
+            'room_number':room_id,
+            'password':password
+        }
+        
+        response = requests.post('http://se.dahuangggg.me:8000/api/conditioners/reception_register_for_customer/',
+                                 data=data
+                                 )
+        if(response.status_code == 200):
+            return True
+        else:
+            return False
 
     def check_out(self, room_id):
         """
         退房
         """
+        data = {
+            'room_number':room_id
+        }
+        response = requests.post('http://se.dahuangggg.me:8000/api/conditioners/reception_check_out_for_customer/',
+                                 data=data
+                                 )
         data = {'列1': ['值1', '值3'], '列2': ['值2', '值4']}  # 详单信息
         return True, data
 
-    def check(self,room_id):
+    def check(self,room_id,start_time = '2023-11-21 00:00:00',end_time = '2023-11-22 15:45:32'):
         '''
-        查看某个房间的详单
+        查看某个房间的详单'api/logs/get_ac_info/'
         '''
-        data = {'列1': ['值1', '值3'], '列2': ['值2', '值4']}  # 详单信息
+        data = {
+            'start_time':start_time,
+            'end_time':end_time
+        }
+        response = requests.post('http://10.129.67.27:8000/api/logs/get_ac_info/',
+                                 data=data
+                                 )
+        output = json.loads(response.content)['detail']
+        for dict in output:
+            if(dict['roomNumber'] == '房间101'):
+                detial = dict
+        print(detial)
+
         return True, data
+
+
+    def check_all_log(self):
+        response = requests.get('http://se.dahuangggg.me/api/logs/get_all_logs/')
+        data = json.loads(response.content)['log']
+        return data
+    
+
+    def check_room_expense(self,room_id):
+        response = requests.get('http://se.dahuangggg.me/api/logs/get_room_expense/')
+        output = json.loads(response.content)['roomExpense']
+        for dict_list in output:
+            if(dict_list['labels'] == room_id):
+                data = dict_list['datasets']
+        return True,data
+        
+
 
     def getoperate(self):
         """
@@ -67,3 +123,21 @@ class hotel_data():
         """
         pass
         return True
+    
+    def update_ac(self):
+        name = {
+            'token':'房间101'
+        }
+        response = requests.post('http://10.129.67.27:8000/api/conditioners/get_ac_info/',data=name)
+        data = json.loads(response.content)
+        print(data)
+        data['targetTemperature'] = 20
+        response = requests.post('http://10.129.67.27:8000/api/conditioners/update_ac_info/',json=data,params={'token':'房间101'})
+        print(response.status_code)
+        if(response.status_code == 200):
+            print('更新成功')
+
+
+if __name__ == '__main__':
+    test = hotel_data('test')
+    test.update_ac()
