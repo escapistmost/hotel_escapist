@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>POST请求示例</title>
+</head>
+<body>
+    <h1>发送POST请求</h1>
+    <form id="myForm">
+        <label for="textInput">文本输入框:</label>
+        <input type="text" id="acMode" name="userInput" placeholder="在这里输入文本">
+        <button type="button" onclick="postData('acMode')">发送POST请求</button>
+        <label for="textInput">文本输入框:</label>
+        <input type="text" id="targetTemperature" name="userInput" placeholder="在这里输入文本">
+        <button type="button" onclick="postData('targetTemperature')">发送POST请求</button>
+    </form>
+
+    <script>
+        function postData(name) {
+            var userInput = document.getElementById(name).value;
+
+            // 创建一个新的XMLHttpRequest对象
+            var xhr = new XMLHttpRequest();
+
+            // 设置POST请求的URL
+            xhr.open("POST", "http://127.0.0.1:5000/customer/air_conditioner/", true);
+
+            // 设置POST请求的请求头
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            //xhr.setRequestHeader("token", " 房间101"); 
+
+            // 定义处理响应的回调函数
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 在此处处理后端响应
+                    console.log(xhr.responseText);
+                }
+            };
+
+            // 构建要发送的数据
+            var data = name+ '=' + encodeURIComponent(userInput);
+
+            // 发送POST请求
+            xhr.send(data);
+        }
+    </script>
+</body>
+</html>
