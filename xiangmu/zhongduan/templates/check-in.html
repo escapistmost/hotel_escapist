@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>设置密码</title>
+    <script>
+        function validatePassword() {
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                // 密码不匹配，显示错误消息
+                alert('密码和确认密码不匹配！');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>设置密码</h1>
+    <form action="/receptionist/check_in" method="post" onsubmit="return validatePassword()">
+        <!-- 房间号作为隐藏字段 -->
+        <input type="hidden" id="roomNumber" name="roomNumber" value="{{ roomNumber }}">
+
+        <label for="password">密码:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <label for="confirmPassword">确认密码:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required><br><br>
+
+        <input type="submit" value="提交">
+    </form>
+</body>
+</html>
