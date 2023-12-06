@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>系统设置</title>
+</head>
+<body>
+    <h1>系统设置</h1>
+
+    <form action="/receptionist/operate_set" method="post">
+        <!-- 温度上限 -->
+        <label for="tempUpperLimit">温度上限:</label>
+        <input type="number" id="tempUpperLimit" name="tempUpperLimit" value="{{ temp_upper_limit }}"><br>
+
+        <!-- 温度下限 -->
+        <label for="tempLowerLimit">温度下限:</label>
+        <input type="number" id="tempLowerLimit" name="tempLowerLimit" value="{{ temp_lower_limit }}"><br>
+
+        <!-- 工作模式 -->
+        <label for="workMode">工作模式:</label>
+        <select id="workMode" name="workMode">
+            {% for mode in work_modes %}
+            <option value="{{ mode }}">{{ mode }}</option>
+            {% endfor %}
+        </select><br>
+
+        <!-- 风速费率 -->
+        <label for="rateLow">低风速费率:</label>
+        <input type="text" id="rateLow" name="rateLow" value="{{ speed_rates['low'] }}"><br>
+
+        <label for="rateMedium">中风速费率:</label>
+        <input type="text" id="rateMedium" name="rateMedium" value="{{ speed_rates['medium'] }}"><br>
+
+        <label for="rateHigh">高风速费率:</label>
+        <input type="text" id="rateHigh" name="rateHigh" value="{{ speed_rates['high'] }}"><br>
+
+        <!-- 提交和返回按钮 -->
+        <input type="submit" value="提交">
+    </form>
+
+    <button onclick="window.location.href='/'">返回主页</button>
+
+</body>
+</html>
