@@ -37,9 +37,9 @@ class hotel_data():
         response = requests.get('http://se.dahuangggg.me:8000/api/acounts/get_rooms_name/')
         self.room_id = list(json.loads(response.content).values())[0] # 所有房间号
         response = requests.get('http://se.dahuangggg.me:8000/api/conditioners/reception_get_room_number/')
-        self.nused_id = list(json.loads(response.content).values())[0] # 没人用的
-        self.nused_id = [key for key in self.nused_id.keys() if self.nused_id[key] == False]
-        self.used_id = [item for item in self.room_id if item not in self.nused_id]  # 有人在用
+        self.used_id = list(json.loads(response.content).values())[0] # 没人用的
+        self.used_id = [key for key in self.used_id.keys() if self.used_id[key] == False]
+        self.nused_id = [item for item in self.room_id if item not in self.used_id]  # 有人在用
 
     def check_in(self, room_id, password):
         """
