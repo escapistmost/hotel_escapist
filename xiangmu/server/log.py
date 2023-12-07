@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from database_setup import Conditioner, Log, Detail, Settings,User
 from extension import db
 
-log = Blueprint('log', __name__)
+Log = Blueprint('log', __name__)
 
 
 def write_log(log_type, operator, ac, remark='无', request_data=None, up=True):
@@ -156,7 +156,7 @@ def write_detail(ac):
 
 
 # 获取特定空调信息
-@log.route('/api/logs/get_ac_info/', methods=['POST'])
+@Log.route('/api/logs/get_ac_info/', methods=['POST'])
 def get_ac_info():
     try:
         data = request.get_json()
@@ -220,7 +220,7 @@ def get_ac_info():
 
 
 # 获取所有日志信息
-@log.route('/api/logs/get_all_logs/', methods=['GET'])
+@Log.route('/api/logs/get_all_logs/', methods=['GET'])
 def get_all_logs():
     current_time = datetime.now()
     start_time = current_time - timedelta(days=30)
@@ -251,8 +251,8 @@ def get_all_logs():
 
 
 # 获取房间费用信息
-@log.route('/api/logs/get_all_logs/', methods=['GET'])
-def get_all_logs():
+@Log.route('/api/logs/get_all_logs/', methods=['GET'])
+def get_logs():
     log_list = []
     for ac in Conditioner.query.all():
         # 获取最新的入住日志
@@ -275,7 +275,7 @@ def get_all_logs():
 
 
 # 获取所有详细信息
-@log.route('/api/logs/get_all_details/', methods=['GET'])
+@Log.route('/api/logs/get_all_details/', methods=['GET'])
 def get_all_details():
     detail_list = []
     for ac in Conditioner.query.all():

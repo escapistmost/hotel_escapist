@@ -234,3 +234,19 @@ def operate_set():
     else:
         # 连注册都没注册的话送到登录页面去
         return redirect(url_for('log_and_submit.login'))
+
+@hotel_receptionist.route('/log_out')
+def log_out():
+    """
+    依据方法进入对应房间修改页面或者修改房间内容
+    :return :下载excel表格
+    """
+    if 'username' in session:
+        # 检查是不是前台，是的话返回前台首页，不是的话返回顾客首页
+        if session['identification'] == '客户':
+            return redirect(url_for('customer.homepage'))
+        else:
+           session.clear()
+    else:
+        # 连注册都没注册的话送到登录页面去
+        return redirect(url_for('log_and_submit.login'))
