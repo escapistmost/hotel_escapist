@@ -16,9 +16,9 @@ class log_data():
         self.verification = True  # 是否得到内容
         self.identify = True  # 密码是否正确
         self.room_id = 101
-        self.token = self.login(username, password, role, test)
+        self.token ,self.room_id= self.login(username, password, role, test)
 
-    def login(self, username, password, role, test):
+    def login(self, username, password, role, test=None):
 
         test = {
             'username': '222',
@@ -46,8 +46,9 @@ class log_data():
         lst = json.loads(response.content)
         room_id=None
         for dict in lst:
-            if dict['username'] == data[username] and dict['role'] == data['role'] and dict['roomNumber'] != None:
+            if dict['username'] == data['username'] and dict['role'] == data['role'] and dict['roomNumber'] != None:
                 room_id = dict['roomNumber']
+        print(token,room_id)
         return token, room_id
 
 
