@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, B
 import requests
 import json
 
-path = '139.59.115.34:5000'
+PATH = '127.0.0.1:5000'  # '139.59.115.34:5000'
 
 
 class log_data():
@@ -11,31 +11,44 @@ class log_data():
     登录注册部分可能会用到的信息
     """
 
-    def __init__(self, username, password, role):
+    def __init__(self, username='', password='', role='', test=False):
         self.identification = '管理员'
         self.verification = True  # 是否得到内容
         self.identify = True  # 密码是否正确
         self.room_id = 101
-        self.token = self.login(username, password, role)
+        self.token = self.login(username, password, role, test)
 
-    def login(self, username, password, role, test=False):
+    def login(self, username, password, role, test):
+
+        test = {
+            'username': '222',
+            'password': '222',
+            'role': '管理员'
+        }  # 测试用
         if test:
-            data = {
-                'username': '333',
-                'password': '333',
-                'role': '前台'
-            }  # 测试用
+            data = test
         else:
             data = {
                 'username': username,
                 'password': password,
                 'role': role
             }
-        response = requests.post(f'http://{path}/login',
+        response = requests.post(f'http://{PATH}/login',
                                  json=data
                                  )
         token = json.loads(response.content)['token']
-        return token
+        manager_token = json.loads(requests.post(f'http://{PATH}/login',
+                                                 json=test).content)['token']
+        headers = {
+            'Authorization': 'Bearer ' + manager_token
+        }
+        response = requests.get(f'http://{PATH}/view-accounts', headers=headers)
+        lst = json.loads(response.content)
+        room_id=None
+        for dict in lst:
+            if dict['username'] == data[username] and dict['role'] == data['role'] and dict['roomNumber'] != None:
+                room_id = dict['roomNumber']
+        return token, room_id
 
 
 class hotel_data():
@@ -51,6 +64,25 @@ class hotel_data():
 
     def __str__(self) -> str:
         return self.username
+
+    def update_ac(self, room_id, input, token):
+        headers = {
+            'Authorization': 'Bearer ' + token
+        }
+        print(token)
+        response = requests.get(f'http://{PATH}/room-status/{int(room_id)}', headers=headers)
+        data = json.loads(response.content)
+        print(data)
+        for key, value in input.items():
+            if (key == 'switch'):
+                if (value == True):
+                    data['isOn'] = not data['isOn']
+            else:
+                data[key] = value
+        response = requests.post(f'http://{PATH}//update-status/{int(room_id)}', json=data, headers=headers)
+        print(response.status_code)
+        if (response.status_code == 200):
+            print('更新成功')
 
     def room(self, token):
         """
@@ -69,32 +101,63 @@ class hotel_data():
         headers = {
             'Authorization': 'Bearer ' + token
         }
-        response = requests.get(f'http://{path}/rooms-available',
+        response = requests.get(f'http://{PATH}/rooms-available',
                                 headers=headers
                                 )
-        print(response.status_code)
+        # print(response.status_code)
         data = json.loads(response.content)
-        self.room_id = [str(dict['number']) for dict in data]
-        self.nused_id = [str(dict['number']) for dict in data if dict['occupied'] == False]
-        self.used_id = [str(dict['number']) for dict in data if dict['occupied'] == True]
+        print(data)
+        self.room_id = [dict['number'] for dict in data]
+        self.nused_id = [dict['number'] for dict in data if dict['occupied'] == False]
+        self.used_id = [dict['number'] for dict in data if dict['occupied'] == True]
         return self.room_id, self.nused_id, self.used_id
 
-    def check_in(self, room_id, password):
+    def check_in(self, user_name='', password='', idCard='', phone='', roomType='', days='', roomNumber='', token='',
+                 test=False):
         """
         入住
         """
-        data = {
-            'room_number': room_id,
-            'password': password
-        }
+        # data = {  # dahuanggg
+        #     'room_number':room_id,
+        #     'password':password
+        # }
 
-        response = requests.post('http://se.dahuangggg.me:8000/api/conditioners/reception_register_for_customer/',
-                                 data=data
-                                 )
-        if (response.status_code == 200):
-            return True
+        # response = requests.post('http://se.dahuangggg.me:8000/api/conditioners/reception_register_for_customer/',
+        #                          data=data
+        #                          )
+        # if(response.status_code == 200):
+        #     return True
+        # else:
+        #     return False
+        print('check_in')
+        if test:
+            data = {
+                'username': '333',
+                'password': '333',
+                'idCard': idCard,
+                'phone': phone,
+                'roomType': roomType,
+                'days': days,
+                'roomNumber': 111
+            }
         else:
-            return False
+            data = {
+                'username': user_name,
+                'password': password,
+                'idCard': idCard,
+                'phone': phone,
+                'roomType': roomType,
+                'days': days,
+                'roomNumber': roomNumber
+            }
+        headers = {
+            'Authorization': 'Bearer ' + token
+        }
+        print(f'http://{PATH}/register')
+        response = requests.post(f'http://{PATH}/register', json=data, headers=headers)
+        if response.status_code == 201:
+            print('success')
+            return True
 
     def check_out(self, room_id):
         """
@@ -152,8 +215,9 @@ class hotel_data():
 
 
 if __name__ == '__main__':
+    acount = log_data(test=True)
     test = hotel_data('test')
-    test.login()
-    test.room()
+    print(test.room(token=acount.token))
+    test.check_in(token=acount.token, test=True)
     _, data = test.check_out('')
     print(data)

@@ -36,14 +36,14 @@ def submit():
 
     try:
         # 申请数据库对应的内容，返回字典与是否正确，不正确则弹出错误转到except部分
-        dic = log_data(username, password, roll)
+        dic, room_id = log_data(username, password, roll)
         if dic.verification == True and dic.identify == True:
             # 如果正确，则依据身份不同建立对应的session，包括房间号等
             session['username'] = username
             session['identification'] = roll
             session['token'] = dic.token
             if session['identification'] == '客户':
-                session['room_id'] = dic.room_id
+                session['room_id'] = room_id
                 return redirect(url_for('customer.homepage'))
             else:
                 return redirect(url_for('hotel_receptionist.homepage'))

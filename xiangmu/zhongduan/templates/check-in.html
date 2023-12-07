@@ -32,15 +32,15 @@
             display: block;
             color: #444;
         }
-        input[type=password] {
+        input[type=text], input[type=password] {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
             border-radius: 5px;
             border: 1px solid #ccc;
-            box-sizing: border-box; /* 添加box-sizing */
+            box-sizing: border-box;
         }
-        input[type=password]:focus {
+        input[type=text]:focus, input[type=password]:focus {
             border-color: #007bff;
             box-shadow: 0 0 8px rgba(0,123,255,.25);
         }
@@ -75,6 +75,9 @@
         <h1>设置密码</h1>
         <form action="/receptionist/check_in" method="post" onsubmit="return validatePassword()">
             <input type="hidden" id="roomNumber" name="roomNumber" value="{{ roomNumber }}">
+
+            <label for="user_name">用户名:</label>
+            <input type="text" id="user_name" name="user_name" required>
 
             <label for="password">密码:</label>
             <input type="password" id="password" name="password" required>

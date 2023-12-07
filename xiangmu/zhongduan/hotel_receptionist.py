@@ -39,6 +39,8 @@ def query():
         else:
             action = request.args.get('action')
             dic = hotel_data(session['username'])
+            dic.room(session['token'])
+            print(dic.room_id,dic.used_id,dic.used_id)
             if action == 'check_in':
                 return render_template('query.html', list1=dic.room_id, list2=dic.nused_id, message='该房间已被使用',
                                        target_url='/receptionist/check_in')
@@ -72,9 +74,11 @@ def check_in():
             if request.method == 'POST':
                 password = request.form['password']
                 room_id = request.form['roomNumber']
+                user_name=request.form['user_name']
                 dic = hotel_data('username')
+                print(password,room_id,user_name )
                 try:
-                    if dic.check_in(room_id, password):
+                    if dic.check_in(roomNumber=room_id, password=password,token=session['token'],user_name=user_name):
                         return render_template('good_check_in.html', roomNumber=room_id)
                     raise Exception("Verification failed")  # 只要工作做不成就报错转到except，成了直接返回走
                 except:
@@ -210,30 +214,32 @@ def operate_set():
                 try:
                     temp_upper_limit, temp_lower_limit, work_modes, speed_rates = dic.getoperate()
                     return render_template('operate_set.html',
-                                    temp_upper_limit=temp_upper_limit,
-                                    temp_lower_limit=temp_lower_limit,
-                                    work_modes=work_modes,
-                                    speed_rates=speed_rates)
+                                           temp_upper_limit=temp_upper_limit,
+                                           temp_lower_limit=temp_lower_limit,
+                                           work_modes=work_modes,
+                                           speed_rates=speed_rates)
                 except:
                     return '网络/权限出现问题'
             else:
                 try:
-                    dic=hotel_data(session['username'])
+                    dic = hotel_data(session['username'])
                     temp_upper_limit = request.form.get('tempUpperLimit')
                     temp_lower_limit = request.form.get('tempLowerLimit')
                     work_mode = request.form.get('workMode')
                     rate_low = request.form.get('rateLow')
                     rate_medium = request.form.get('rateMedium')
                     rate_high = request.form.get('rateHigh')
-                    print(temp_upper_limit ,temp_lower_limit,work_mode,rate_low,rate_medium,rate_high)
-                    if not dic.operate_set(temp_upper_limit ,temp_lower_limit,work_mode,rate_low,rate_medium,rate_high):
+                    print(temp_upper_limit, temp_lower_limit, work_mode, rate_low, rate_medium, rate_high)
+                    if not dic.operate_set(temp_upper_limit, temp_lower_limit, work_mode, rate_low, rate_medium,
+                                           rate_high):
                         raise Exception("Verification failed")
                     return render_template('receptionist_homepage.html', name=session['username'])
-                except :
+                except:
                     return '网络/权限出现问题'
     else:
         # 连注册都没注册的话送到登录页面去
         return redirect(url_for('log_and_submit.login'))
+
 
 @hotel_receptionist.route('/log_out')
 def log_out():
@@ -246,7 +252,7 @@ def log_out():
         if session['identification'] == '客户':
             return redirect(url_for('customer.homepage'))
         else:
-           session.clear()
+            session.clear()
     else:
         # 连注册都没注册的话送到登录页面去
         return redirect(url_for('log_and_submit.login'))
