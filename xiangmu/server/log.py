@@ -186,32 +186,38 @@ def get_ac_info():
             }
 
         for log in logs_query.all():
-            room_name = log.conditioner.room_number
-            detail[room_name]['detail_times'] += 1
+            if log.object_id:
+                conditioner = Conditioner.query.get(log.object_id)
+                if conditioner:
+                    room_name = conditioner.room_number
+                    detail[room_name]['detail_times'] += 1
 
-            if log.type == '开关机':
-                detail[room_name]['on_off_times'] += 1
-            elif log.type == '调度':
-                detail[room_name]['dispatch_times'] += 1
-            elif log.type == '调温':
-                detail[room_name]['temperature_times'] += 1
-            elif log.type == '调风':
-                detail[room_name]['mode_times'] += 1
+                    if log.type == '开关机':
+                        detail[room_name]['on_off_times'] += 1
+                    elif log.type == '调度':
+                        detail[room_name]['dispatch_times'] += 1
+                    elif log.type == '调温':
+                        detail[room_name]['temperature_times'] += 1
+                    elif log.type == '调风':
+                        detail[room_name]['mode_times'] += 1
 
-            # 计算请求时长
-            if log.type == '请求服务':
-                end_service_log = logs_query.filter(Log.object_id == conditioner.id, Log.type == '结束服务',
-                                                    Log.time > log.time).first()
-                if end_service_log:
-                    request_time = end_service_log.time - log.time
-                else:
-                    request_time = datetime.now() - log.time
-                detail[room_name]['request_time'] += request_time.total_seconds()
+                    # 计算请求时长
+                    if log.type == '请求服务':
+                        end_service_log = Log.query.filter(
+                            Log.object_id == conditioner.id,
+                            Log.type == '结束服务',
+                            Log.time > log.time
+                        ).first()
+                        if end_service_log:
+                            request_time = end_service_log.time - log.time
+                        else:
+                            request_time = datetime.now() - log.time
+                        detail[room_name]['request_time'] += request_time.total_seconds()
 
-            # 计算总费用
-            if log.type == '产生费用':
-                fee = float(log.remark.split('产生费用')[1].strip('元').split(' ')[0])
-                detail[room_name]['total_cost'] += fee
+                    # 计算总费用
+                    if log.type == '产生费用':
+                        fee = float(log.remark.split('产生费用')[1].strip('元').split(' ')[0])
+                        detail[room_name]['total_cost'] += fee
 
         detail_array = list(detail.values())
         return jsonify({'detail': detail_array}), 200

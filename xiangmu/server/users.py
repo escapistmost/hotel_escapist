@@ -59,8 +59,9 @@ def change_password():
 
 
 # 获取所有用户名称
-@users.route('/api/accounts/get_rooms_name/', methods=['GET'])
+@users.route('/api/accounts/get_unused_rooms_name/', methods=['GET'])
 def get_rooms_name():
+
     try:
         roomNumber = {}
         for conditioner in Conditioner.query.order_by(Conditioner.room_number).all():

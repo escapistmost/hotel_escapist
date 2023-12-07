@@ -2,8 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from extension import db
 from datetime import datetime
-
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
@@ -55,7 +53,6 @@ class Settings(db.Model):
     temperature_upper = db.Column(db.Integer)  # 温度上限
     temperature_lower = db.Column(db.Integer)  # 温度下限
     mode = db.Column(db.String(20))  # 模式，只有三种选择：制冷，制热，通风
-
     # 新增的字段
     low_speed_fee = db.Column(db.Float, default=1)  # 低速风费率 (元/1C°)
     mid_speed_fee = db.Column(db.Float, default=1)  # 中速风费率 (元/1C°)
