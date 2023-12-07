@@ -160,10 +160,21 @@ class hotel_data():
             print('success')
             return True
 
-    def check_out(self, room_id):
+    def check_out(self, room_id, token):
         """
         退房
         """
+        headers = {
+            'Authorization': 'Bearer ' + token
+        }
+        data = {
+            'roomNumber':int(room_id)
+        }
+        response = requests.post(f'http://{PATH}/check-out',json=data,headers=headers)
+        if response.status_code == 201:
+            return True,self.check_room_expense(int(room_id),token)
+        else:
+            return False,None
 
     def check(self, room_id, start_time='2023-11-21 00:00:00', end_time='2023-11-22 15:45:32'):
         '''
@@ -189,13 +200,13 @@ class hotel_data():
         data = json.loads(response.content)['log']
         return data
 
-    def check_room_expense(self, room_id):
-        response = requests.get('http://se.dahuangggg.me/api/logs/get_room_expense/')
-        output = json.loads(response.content)['roomExpense']
-        for dict_list in output:
-            if (dict_list['labels'] == room_id):
-                data = dict_list['datasets']
-        return True, data
+    def check_room_expense(self, room_id, token):
+        headers = {
+            'Authorization': 'Bearer ' + token
+        }
+        response = requests.get(f'http://{PATH}/room-details/{int(room_id)}', headers=headers)
+        data = json.loads(response.content)['roomDetails']
+        return {i: row for i, row in enumerate(data)}
 
     def getoperate(self):
         """

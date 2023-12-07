@@ -40,7 +40,7 @@ def query():
             action = request.args.get('action')
             dic = hotel_data(session['username'])
             dic.room(session['token'])
-            print(dic.room_id,dic.used_id,dic.used_id)
+            print(dic.room_id, dic.used_id, dic.used_id)
             if action == 'check_in':
                 return render_template('query.html', list1=dic.room_id, list2=dic.nused_id, message='该房间已被使用',
                                        target_url='/receptionist/check_in')
@@ -74,11 +74,11 @@ def check_in():
             if request.method == 'POST':
                 password = request.form['password']
                 room_id = request.form['roomNumber']
-                user_name=request.form['user_name']
+                user_name = request.form['user_name']
                 dic = hotel_data('username')
-                print(password,room_id,user_name )
+                print(password, room_id, user_name)
                 try:
-                    if dic.check_in(roomNumber=room_id, password=password,token=session['token'],user_name=user_name):
+                    if dic.check_in(roomNumber=room_id, password=password, token=session['token'], user_name=user_name):
                         return render_template('good_check_in.html', roomNumber=room_id)
                     raise Exception("Verification failed")  # 只要工作做不成就报错转到except，成了直接返回走
                 except:
@@ -106,11 +106,12 @@ def check_out():
         else:
             dic = hotel_data(session['username'])
             room_id = request.args.get('element')
-            judgment, data = dic.check_out(room_id)
+            judgment, data = dic.check_out(room_id, session['token'])
             if judgment:
                 # 创建Excel文件
                 df = pd.DataFrame(data)
                 filename = f'checkout_{room_id}.xlsx'
+                df = df.transpose()
                 df.to_excel(filename, index=False)
                 # 在session中存储文件名
                 session['excel_filename'] = filename
@@ -166,10 +167,11 @@ def print_receipt():
         else:
             dic = hotel_data(session['username'])
             room_id = request.args.get('element')
-            judgment, data = dic.check_room_expense(room_id)
-            if judgment:
+            data = dic.check_room_expense(room_id,session['token'])
+            if data:
                 df = pd.DataFrame(data)
                 filename = f'checkout_{room_id}.xlsx'
+                df = df.transpose()
                 df.to_excel(filename, index=False)
                 # 在session中存储文件名
                 session['excel_filename'] = filename
