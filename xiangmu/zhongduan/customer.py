@@ -1,19 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, session, Blueprint
 import requests
 import json
+
 customer = Blueprint('customer', __name__)
 
-
 base_data = {
-            'roomNumber': 0,
-            'currentTemperature': 0,
-            'targetTemperature': 0,
-            'acStatus': '',
-            'acMode': '',
-            'cost': 0,
-            'totalCost': 0,
-            'queueStatus': '',
-        }
+    'roomNumber': 0,
+    'currentTemperature': 0,
+    'targetTemperature': 0,
+    'acStatus': '',
+    'acMode': '',
+    'cost': 0,
+    'totalCost': 0,
+    'queueStatus': '',
+}
+
 
 @customer.route('/')
 def homepage():
@@ -31,7 +32,6 @@ def homepage():
     else:
         # 连注册都没注册的话送到登录页面去
         return render_template('customer_homepage.html')
-        return redirect(url_for('log_and_submit.login'))
 
 
 @customer.route('/open_condition')
@@ -52,22 +52,22 @@ def open_condition():
         # 连注册都没注册的话送到登录页面去
         return redirect(url_for('log_and_submit.login'))
 
+
 @customer.route('/air_conditioner/', methods=['POST'])
 def update_ac():
     name = {
-        'token':'房间101'
+        'token': '房间101'
     }
-    response = requests.post('http://se.dahuangggg.me:8000/api/conditioners/get_ac_info/',data=name)
+    response = requests.post('http://se.dahuangggg.me:8000/api/conditioners/get_ac_info/', data=name)
     data = json.loads(response.content)
-    
 
-    for key,value in request.form.to_dict().items():
-        print(key,value)
+    for key, value in request.form.to_dict().items():
+        print(key, value)
         data[key] = value
     print(type(data))
-    #response = requests.post('http://10.129.67.27:8000/api/conditioners/update_ac_info/',data=data,params={'token':'abc'})
+    # response = requests.post('http://10.129.67.27:8000/api/conditioners/update_ac_info/',data=data,params={'token':'abc'})
     print(response.status_code)
-    if(response.status_code == 200):
+    if (response.status_code == 200):
         print('更新成功')
     return "<h1>{data}<h1>"
 

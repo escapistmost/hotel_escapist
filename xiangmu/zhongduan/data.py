@@ -134,7 +134,7 @@ class hotel_data():
         data['targetTemperature'] = 20
         response = requests.post('http://10.129.67.27:8000/api/conditioners/update_ac_info/',json=data,params={'token':'房间101'})
         print(response.status_code)
-        if(response.status_code == 200):
+        if response.status_code == 200:
             print('更新成功')
 
 
