@@ -111,7 +111,6 @@ def check_out():
                 # 创建Excel文件
                 df = pd.DataFrame(data)
                 filename = f'checkout_{room_id}.xlsx'
-                df = df.transpose()
                 df.to_excel(filename, index=False)
                 # 在session中存储文件名
                 session['excel_filename'] = filename
@@ -171,7 +170,6 @@ def print_receipt():
             if data:
                 df = pd.DataFrame(data)
                 filename = f'checkout_{room_id}.xlsx'
-                df = df.transpose()
                 df.to_excel(filename, index=False)
                 # 在session中存储文件名
                 session['excel_filename'] = filename

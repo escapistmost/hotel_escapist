@@ -18,27 +18,29 @@ class log_data():
         self.room_id = 101
         self.token ,self.room_id= self.login(username, password, role, test)
 
-    def login(self, username, password, role, test=None):
-
-        test = {
+    def login(self, username, password, role, test):
+        #print(username, password, role)
+        test_data = {
             'username': '222',
             'password': '222',
             'role': '管理员'
         }  # 测试用
         if test:
-            data = test
+            data = test_data
         else:
             data = {
-                'username': username,
-                'password': password,
+                'username': str(username),
+                'password': str(password),
                 'role': role
             }
+        #print(data)
         response = requests.post(f'http://{PATH}/login',
                                  json=data
                                  )
+
         token = json.loads(response.content)['token']
         manager_token = json.loads(requests.post(f'http://{PATH}/login',
-                                                 json=test).content)['token']
+                                                 json=test_data).content)['token']
         headers = {
             'Authorization': 'Bearer ' + manager_token
         }
@@ -46,9 +48,13 @@ class log_data():
         lst = json.loads(response.content)
         room_id=None
         for dict in lst:
+            #print(dict)
+            #print(data)
+            #print(dict['username'] == data['username'] , dict['role'] == data['role'] , dict['roomNumber'] != None)
             if dict['username'] == data['username'] and dict['role'] == data['role'] and dict['roomNumber'] != None:
+                #print('成功查找')
                 room_id = dict['roomNumber']
-        print(token,room_id)
+        #print(lst)
         return token, room_id
 
 
@@ -70,18 +76,24 @@ class hotel_data():
         headers = {
             'Authorization': 'Bearer ' + token
         }
-        print(token)
+        #print(token)
         response = requests.get(f'http://{PATH}/room-status/{int(room_id)}', headers=headers)
         data = json.loads(response.content)
-        print(data)
+        data['temperature'] = data['acTemperature']
         for key, value in input.items():
             if (key == 'switch'):
-                if (value == True):
-                    data['isOn'] = not data['isOn']
+                if (value == 'true'):
+                    if(data['isOn'] == 0):
+                        data['isOn'] = 1
+                    elif(data['isOn'] == 1):
+                        data['isOn'] = 0
+                    else:
+                        data['isOn'] = not data['isOn']
             else:
                 data[key] = value
+        #print(data)
         response = requests.post(f'http://{PATH}//update-status/{int(room_id)}', json=data, headers=headers)
-        print(response.status_code)
+        #print(response.status_code)
         if (response.status_code == 200):
             print('更新成功')
 
@@ -205,8 +217,10 @@ class hotel_data():
             'Authorization': 'Bearer ' + token
         }
         response = requests.get(f'http://{PATH}/room-details/{int(room_id)}', headers=headers)
+        if response.status_code != 200:
+            return []
         data = json.loads(response.content)['roomDetails']
-        return {i: row for i, row in enumerate(data)}
+        return data
 
     def getoperate(self):
         """
@@ -229,7 +243,7 @@ class hotel_data():
 if __name__ == '__main__':
     acount = log_data(test=True)
     test = hotel_data('test')
-    print(test.room(token=acount.token))
-    test.check_in(token=acount.token, test=True)
-    _, data = test.check_out('')
-    print(data)
+    test.check_room_expense(111,acount.token)
+    #print(test.room(token=acount.token))
+    #test.check_in(token=acount.token, test=True)
+

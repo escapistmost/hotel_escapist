@@ -58,14 +58,19 @@ def open_condition():
 
 @customer.route('/air_conditioner/', methods=['POST'])
 def post():
+    print('start')
     print(request.form.to_dict())
+    print(session)
     if 'username' in session:
+        print('username')
         if session['identification'] == '客户':
             if 'room_id' in session:
                 function = hotel_data('')
+                print(session)
                 function.update_ac(session['room_id'],request.form.to_dict(),session['token'])
+                return jsonify({'msg':'成功'}),200
             else:
-                return jsonify({'err':'请先登记入住'}),404
+                return jsonify({'msg':'请先登记入住'}),404
 
 
 
