@@ -39,7 +39,6 @@ def query():
         else:
             action = request.args.get('action')
             dic = hotel_data(session['username'])
-            dic.room()
             if action == 'check_in':
                 return render_template('query.html', list1=dic.room_id, list2=dic.nused_id, message='该房间已被使用',
                                        target_url='/receptionist/check_in')
@@ -163,7 +162,7 @@ def print_receipt():
         else:
             dic = hotel_data(session['username'])
             room_id = request.args.get('element')
-            judgment, data = dic.check(room_id)
+            judgment, data = dic.check_room_expense(room_id)
             if judgment:
                 df = pd.DataFrame(data)
                 filename = f'checkout_{room_id}.xlsx'
